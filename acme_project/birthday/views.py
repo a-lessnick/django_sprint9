@@ -3,10 +3,17 @@ from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView
 )
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 from .forms import BirthdayForm
 from .models import Birthday
 from .utils import calculate_birthday_countdown
+
+
+@login_required
+def simple_view(request):
+    return HttpResponse('Страница для залогиненных пользователей!')
 
 
 class BirthdayListView(ListView):
