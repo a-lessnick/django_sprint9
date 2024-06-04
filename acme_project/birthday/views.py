@@ -4,7 +4,7 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
 
 from .forms import BirthdayForm
@@ -20,20 +20,33 @@ def simple_view(request):
 class BirthdayListView(ListView):
     model = Birthday
     ordering = 'id'
-    paginate_by = 10
+    paginate_by = 5
+
+
+class OnlyAuthorMixin(UserPassesTestMixin):
+
+    def test_func(self):
+        object = self.get_object()
+        return object.author == self.request.user
 
 
 class BirthdayCreateView(LoginRequiredMixin, CreateView):
     model = Birthday
     form_class = BirthdayForm
 
+    def form_valid(self, form):
+        # Присвоить полю author объект пользователя из запроса.
+        form.instance.author = self.request.user
+        # Продолжить валидацию, описанную в форме.
+        return super().form_valid(form)
 
-class BirthdayUpdateView(LoginRequiredMixin, UpdateView):
+
+class BirthdayUpdateView(LoginRequiredMixin, OnlyAuthorMixin, UpdateView):
     model = Birthday
     form_class = BirthdayForm
 
 
-class BirthdayDeleteView(LoginRequiredMixin, DeleteView):
+class BirthdayDeleteView(LoginRequiredMixin, OnlyAuthorMixin, DeleteView):
     model = Birthday
     success_url = reverse_lazy('birthday:list')
 
