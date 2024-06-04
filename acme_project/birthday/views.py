@@ -17,7 +17,7 @@ def simple_view(request):
     return HttpResponse('Страница для залогиненных пользователей!')
 
 
-class BirthdayListView(LoginRequiredMixin, ListView):
+class BirthdayListView(ListView):
     model = Birthday
     ordering = 'id'
     paginate_by = 10
