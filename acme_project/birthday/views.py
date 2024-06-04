@@ -4,6 +4,7 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 
 from .forms import BirthdayForm
@@ -16,28 +17,28 @@ def simple_view(request):
     return HttpResponse('Страница для залогиненных пользователей!')
 
 
-class BirthdayListView(ListView):
+class BirthdayListView(LoginRequiredMixin, ListView):
     model = Birthday
     ordering = 'id'
     paginate_by = 10
 
 
-class BirthdayCreateView(CreateView):
+class BirthdayCreateView(LoginRequiredMixin, CreateView):
     model = Birthday
     form_class = BirthdayForm
 
 
-class BirthdayUpdateView(UpdateView):
+class BirthdayUpdateView(LoginRequiredMixin, UpdateView):
     model = Birthday
     form_class = BirthdayForm
 
 
-class BirthdayDeleteView(DeleteView):
+class BirthdayDeleteView(LoginRequiredMixin, DeleteView):
     model = Birthday
     success_url = reverse_lazy('birthday:list')
 
 
-class BirthdayDetailView(DetailView):
+class BirthdayDetailView(LoginRequiredMixin, DetailView):
     model = Birthday
 
     def get_context_data(self, **kwargs):
